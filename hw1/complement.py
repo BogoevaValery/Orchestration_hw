@@ -1,6 +1,7 @@
-#!/home/lerathebest/anaconda3/envs/dls/bin/python
+#!/home/lerathebest/.local/share/virtualenvs/Orchestration_hw-lGoKxMCX/bin/python
+
 from Bio.Seq import Seq
-from Bio.SeqUtils import GC
+from Bio.SeqUtils import gc_fraction 
 import argparse
 
 parser = argparse.ArgumentParser()
@@ -10,7 +11,7 @@ seq = args.seq
 
 seq_bp = Seq(seq)
 rev_comp = seq_bp.reverse_complement()
-gc = GC(seq_bp)
+gc = gc_fraction(seq_bp)
 
 print(rev_comp)
-print(gc)
+print(f"{gc:.3f}")

@@ -4,7 +4,7 @@ from Bio.Seq import Seq
 from Bio.SeqUtils import gc_fraction 
 import argparse
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(description="My script to get reverse complement dna strand and gc fraction")
 parser.add_argument("--seq", type=str, help="dna string to process")
 args = parser.parse_args()
 seq = args.seq

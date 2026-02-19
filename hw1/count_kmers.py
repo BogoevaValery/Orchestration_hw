@@ -12,9 +12,18 @@ def get_kmers(seq, k=2):
         yield km
 
 parser = argparse.ArgumentParser(prog="Kmers count", description="Counts kmers in sequences")
-parser.add_argument("--fa", help="fasta file with sequences")
+parser.add_argument("--fa", required=True, help="fasta file with sequences")
+parser.add_arguments("-k", type=int, default=4, help="lenght of kmer")
+parser.add_argumen("--out", default=None, help="output file name")
+
 args = parser.parse_args()
 file = args.fa
+k = args.k
+if args.out == None:
+    basename = file.split(".")[0]
+    outfile = f"{basename}_count_kmers.json"
+else:
+    outfile = args.out
 
 result = dict()
 

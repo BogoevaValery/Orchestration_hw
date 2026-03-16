@@ -31,8 +31,8 @@ jobs:
 
       - name: chmod 
         run: |
-          chmod hw1/complement.py u+x
-          chmod hw1/count_kmers.py u+x
+          chmod u+x hw1/complement.py
+          chmod u+x hw1/count_kmers.py
 
       - name: install biopython
         run: 

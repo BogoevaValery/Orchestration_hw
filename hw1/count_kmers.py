@@ -6,6 +6,7 @@ import argparse
 import json
 
 def get_kmers(seq, k=2):
+    # adding comment in local repo
     seq = str(seq)
     for i in range(k, len(seq)+1):
         km = seq[i-k:i]

@@ -1,5 +1,3 @@
-#!/home/lerathebest/.local/share/virtualenvs/Orchestration_hw-lGoKxMCX/bin/python
-
 from Bio import SeqIO
 from collections import Counter
 import argparse

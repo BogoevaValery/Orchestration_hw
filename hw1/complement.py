@@ -1,5 +1,3 @@
-#!/home/lerathebest/.local/share/virtualenvs/Orchestration_hw-lGoKxMCX/bin/python
-
 from Bio.Seq import Seq
 from Bio.SeqUtils import gc_fraction 
 import argparse

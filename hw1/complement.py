@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from Bio.Seq import Seq
 from Bio.SeqUtils import gc_fraction 
 import argparse

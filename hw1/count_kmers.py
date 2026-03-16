@@ -15,7 +15,7 @@ def get_kmers(seq, k):
 parser = argparse.ArgumentParser(prog="Kmers count", description="Counts kmers in sequences")
 parser.add_argument("--fa", required=True, help="fasta file with sequences")
 parser.add_argument("-k", type=int, default=4, help="lenght of kmer")
-parser.add_argument("--out", default=None, help="output file name")
+parser.add_argument("--out", default="coutnt_kmers_out.json", help="output file name")
 
 args = parser.parse_args()
 file = args.fa

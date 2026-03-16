@@ -5,7 +5,7 @@ from collections import Counter
 import argparse
 import json
 
-def get_kmers(seq, k=2):
+def get_kmers(seq, k=4): # changed 2 to 4 in remote repo
     seq = str(seq)
     for i in range(k, len(seq)+1):
         km = seq[i-k:i]

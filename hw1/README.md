@@ -13,6 +13,10 @@
     --k - длина кмера (по умолчанию 4)
     --out - выходной файл json (ро умолчанию count_kmers_out.json) 
 
+- [test1.fa](test1.fa)
+
+  Тестовый файл для count_kmers.py 
+
 - [lgb.sh](lgb.sh)
     Много задачек для практики с гитом с [learngitbranching](https://learngitbranching.js.org)
 

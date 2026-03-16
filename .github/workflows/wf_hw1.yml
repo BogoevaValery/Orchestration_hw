@@ -44,4 +44,4 @@ jobs:
 
       - name: run count_kmers
         run:
-          ./hw1/count_kmers.py --k 5 --fa hw1/test1.fa --out test1.json
+          ./hw1/count_kmers.py -k 5 --fa hw1/test1.fa --out test1.json

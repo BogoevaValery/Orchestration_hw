@@ -14,12 +14,13 @@ def get_kmers(seq, k):
 
 parser = argparse.ArgumentParser(prog="Kmers count", description="Counts kmers in sequences")
 parser.add_argument("--fa", required=True, help="fasta file with sequences")
-parser.add_arguments("-k", type=int, default=4, help="lenght of kmer")
-parser.add_argumen("--out", default=None, help="output file name")
+parser.add_argument("-k", type=int, default=4, help="lenght of kmer")
+parser.add_argument("--out", default=None, help="output file name")
 
 args = parser.parse_args()
 file = args.fa
 k = args.k
+outfile = args.out
 if args.out == None:
     basename = file.split(".")[0]
     outfile = f"{basename}_count_kmers.json"
@@ -29,10 +30,10 @@ else:
 result = dict()
 
 for seq_record in SeqIO.parse(file, "fasta"):
-    kmers = get_kmers(seq_record.seq)
+    kmers = get_kmers(seq_record.seq, k)
     result[seq_record.id] = Counter(kmers)
 
 print(result)
 
-with open("out.json", "w", encoding="utf-8") as file:
+with open(outfile, "w", encoding="utf-8") as file:
     json.dump(result, file)

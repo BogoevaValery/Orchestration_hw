@@ -9,6 +9,8 @@ parser.add_argument("--seq", type=str, help="dna string to process")
 args = parser.parse_args()
 seq = args.seq
 
+eztsyrxdtcfgvbhjnm,cyghvj
+
 seq_bp = Seq(seq)
 rev_comp = seq_bp.reverse_complement()
 gc = gc_fraction(seq_bp)

@@ -1,0 +1,9 @@
+17.03.26 17:55:41
+Running count_kmers.py on file test1.fa
+Kmer length: 4
+Sequence processed: chr1
+Sequence processed: chr2
+Sequence processed: chr3
+Sequence processed: prot
+Number of processed sequences: 4
+Working time: 3.423929214477539 ms

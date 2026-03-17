@@ -4,6 +4,19 @@ from Bio import SeqIO
 from collections import Counter
 import argparse
 import json
+import logging
+import time
+from datetime import datetime
+
+start = time.time()
+now = datetime.now()
+
+logging.basicConfig(
+    level=logging.INFO, 
+    filename="count_kmers.log",
+    filemode="w",
+    format='%(message)s', 
+    )
 
 def get_kmers(seq, k):
     # kmers generator 
@@ -27,13 +40,25 @@ if args.out == None:
 else:
     outfile = args.out
 
+logging.info(f"{datetime.strftime(now, "%d.%m.%y %H:%M:%S")}")
+logging.info(f"Running count_kmers.py on file {file}")
+logging.info(f"Kmer length: {k}")
+
 result = dict()
 
+cnt = 0
 for seq_record in SeqIO.parse(file, "fasta"):
     kmers = get_kmers(seq_record.seq, k)
     result[seq_record.id] = Counter(kmers)
+    logging.info(f"Sequence processed: {seq_record.id}")
+    cnt+=1
+logging.info(f"Number of processed sequences: {cnt}")
 
 print(result)
 
 with open(outfile, "w", encoding="utf-8") as file:
     json.dump(result, file)
+
+end = time.time()
+work_time = (end - start) * 1e3
+logging.info(f"Working time: {work_time} ms")

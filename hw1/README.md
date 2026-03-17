@@ -78,6 +78,7 @@ gitGraph
 
 6. git checkout main
 7. git merge hw1
+   
   Объединение с main
 
 

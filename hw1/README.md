@@ -67,6 +67,19 @@ gitGraph
 
 ![](../img/pr_ok.png)
 
+Последвательность действий для корректной работы:
+1. Добавление изменений в hw1_test
+2. git push origin hw1_test
+3. pull request hw1 <- hw1_test 
+4. merge, если прошел корректно
+5. git pull origin hw1
+   
+  Подтягиваем слияние 
+
+6. git checkout main
+7. git merge hw1
+  Объединение с main
+
 
 
 

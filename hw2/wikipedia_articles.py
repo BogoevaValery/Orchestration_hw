@@ -17,7 +17,7 @@ def get_internal_links(base_url, href):
     for link in content.find_all("a", href=pattern):
         res.append(link["href"])
     
-    return sorted(res)
+    return list(set(res))
 
 
 my_headers = {"User-Agent": "Mozilla/5.0"}

@@ -42,6 +42,8 @@ else:
 
 logging.info(f"{datetime.strftime(now, "%d.%m.%y %H:%M:%S")}")
 logging.info(f"Running count_kmers.py on file {file}")
+logging.info(f"Kmer length: {k}")
+
 result = dict()
 
 cnt = 0
@@ -50,7 +52,7 @@ for seq_record in SeqIO.parse(file, "fasta"):
     result[seq_record.id] = Counter(kmers)
     logging.info(f"Sequence processed: {seq_record.id}")
     cnt+=1
-logging.info(f"Number of sequences processed: {cnt}")
+logging.info(f"Number of processed sequences: {cnt}")
 
 print(result)
 

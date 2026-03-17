@@ -1,19 +1,20 @@
 import re
 from collections import deque
 import json
+import argparse
 import requests
 from bs4 import BeautifulSoup
 
 def get_internal_links(base_url, href):
+    my_headers = {"User-Agent": "Mozilla/5.0"}
     full_url = requests.compat.urljoin(base_url, href)
     article = requests.get(full_url, headers=my_headers)
     
     print(f"Status code: {article.status_code}")
     
     bs = BeautifulSoup(article.text, "html.parser")
-    #pattern = re.compile(r"^(/wiki/)[A,B,C]")  #((?!:).)*$")
-    #pattern = re.compile(r"^(/wiki/)((?!:).)*$")
-    pattern = re.compile(r"^/wiki/([AB].*)") #((?!:).*)$")
+    
+    pattern = re.compile(r"^(/wiki/)((?!:).)*$")
     content = bs.find("div", id="bodyContent")
     
     res = []
@@ -26,23 +27,16 @@ def get_internal_links(base_url, href):
     
     return list(set(res))
 
-
-my_headers = {"User-Agent": "Mozilla/5.0"}
-start_article = "https://en.wikipedia.org/wiki/American_Revolutionary_War"
-
-#links = get_internal_links("https://en.wikipedia.org/", "wiki/American_Revolutionary_War")
-#print(*links, sep="\n")
-
-depth = 3
-
-def walk_on_depth(base_url, src, max_depth):
-    visited = set()       # уже обработанные страницы
-    graph = {}            # результат: страница -> список ссылок
-    queue = deque()       # очередь для BFS: (относительный_путь, глубина)
-    queue.append((src, 0))
+def walk_on_depth(src, max_depth):
+    base_url = "https://en.wikipedia.org/wiki/"
+    
+    visited = set()       
+    graph = {}            
+    queue = deque()       
+    queue.append((src, 1))
 
     while queue:
-        current, depth = queue.popleft()   # извлекаем слева (FIFO)
+        current, depth = queue.popleft()   
         if current in visited:
             continue
 
@@ -51,17 +45,20 @@ def walk_on_depth(base_url, src, max_depth):
         graph[current] = links
         visited.add(current)
 
-        # Если не достигли максимальной глубины, добавляем ссылки в очередь
         if depth < max_depth:
             for link in links:
                 if link not in visited:
                     queue.append((link, depth + 1))
-
-        
-
+                    
     return graph
 
-res = walk_on_depth("https://en.wikipedia.org/wiki/", "Guar", 2)
+parser = argparse.ArgumentParser(prog="My wiki crawler", description="Builds network graph of english wiki in some depth of some url")
+parser.add_argument("--url", required=True, help="Link to wiki page")
+parser.add_argument("--depth", default=3, help="Depth for walking from url")
+parser.add_argument("--out_json", required=True,help="Name of output json")
+args = parser.parse_args()
+
+res = walk_on_depth(parser.url, parser.depth)
 print(*res, sep="\n")
-with open("net_graph_AB.json", "w", encoding="utf-8") as out:
+with open(parser.out_json, "w", encoding="utf-8") as out:
     json.dump(res, out)

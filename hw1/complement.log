@@ -1,0 +1,5 @@
+17.03.26 16:40:53
+Running complement.py on AATTGGCC
+Reverse complement: GGCCAATT
+GC-fraction: 0.500
+Working time: 9.339332580566406 ms

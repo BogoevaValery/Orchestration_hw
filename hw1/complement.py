@@ -22,6 +22,8 @@ parser.add_argument("--seq", type=str, help="dna string to process")
 args = parser.parse_args()
 seq = args.seq
 
+eztsyrxdtcfgvbhjnm,cyghvj
+
 seq_bp = Seq(seq)
 logging.info(f"{datetime.strftime(now, "%d.%m.%y %H:%M:%S")}")
 logging.info(f"Running complement.py on {seq_bp.upper()}")

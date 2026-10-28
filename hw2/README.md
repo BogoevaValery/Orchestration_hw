@@ -9,14 +9,37 @@
   `--url` - ссылка на статью
   `--out_json` -имя выходного файла
   `--depth` - глубина поиска, по умолчанию 3
+  `--max_links` - максимальное число обойденных ссылок
 
 - [`draw_wiki.py`](draw_wiki.py)
+  
 
 Рисует ориентированный граф из json, полученного с помощью предыдущего скрипта. 
 
-Для ` ./wikipedia_articles.py --url https://en.wikipedia.org/wiki/Guar --depth 4 --out_json wiki_links_from_guar.json` (начинаем со статьи про гуар, проход с глубиной 4\*):
+Командой `./wikipedia_articles.py --url https://en.wikipedia.org/wiki/Guar --depth 5 --max-links 5` был получен файл Guar.json и отрисован командой `./draw_wiki.py --json Guar.json`:
 
-\* - Заменила 5 из задания на 4 - обработка идет довольно долго
+![](../img/wiki_graph.png)
+
+----
+
+- [`amazon_selenium_crawl.py`](amazon_selenium_crawl.py)
+  
+Обходит 5 страниц амазона для запроса и собирает товары и цены на них. Возвращает json для результата.
+
+`--query` - запрос
+
+- [draw_amazon.py](draw_amazon.py)
+
+`--json` - входной файл
+
+Рисует гистограмму для результата.
+
+Командами `./amazon_selenium_crawl.py --query` и `./draw_amazon.py --json labubu.json` была получена гистограмма:
+
+![](../img/labubu.png)
+
+
+
 
 
 

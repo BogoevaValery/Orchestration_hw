@@ -1,33 +1,52 @@
+#!/home/lerathebest/.local/share/virtualenvs/Orchestration_hw-na0ESBGG/bin/python
+
+import argparse
 import json
+
 import networkx as nx
-import matplotlib.pyplot as plt  # только для цветовой карты, можно и без неё
+import matplotlib.pyplot as plt
 
-# 1. Загружаем данные (пример: из переменной или файла)
-with open("/home/lerathebest/Documents/Programming/Orchestration_hw/hw2/wiki_links_from_guar.json", "r", encoding="utf-8") as inp:
-    data = json.load(inp)
 
-# 2. Создаём ориентированный граф
-G = nx.DiGraph()
-for source, targets in data.items():
-    for target in targets:
-        G.add_edge(source, target)
+def main():
+    print("Start")
+    parser = argparse.ArgumentParser(description="Draw Wiki graph")
+    parser.add_argument("--json", required=True, help="Path to json file")
+    parser.add_argument(
+        "--output",
+        default="wiki_graph.png",
+        help="Output file",
+    )
+    args = parser.parse_args()
 
-# 3. Фильтрация узлов
-threshold = 5
-nodes_to_keep = [node for node in G.nodes() if G.degree(node) >= threshold]
-print(f"Всего узлов: {G.number_of_nodes()}, после фильтрации: {len(nodes_to_keep)}")
+    print("Open file ...")
+    with open(args.json, "r", encoding="utf-8") as f:
+        data = json.load(f)
+        print("File loaded")
 
-# Создаём подграф
-G_sub = G.subgraph(nodes_to_keep).copy() 
+    print("Creating graph ...")
+    G = nx.DiGraph()
+    print("Adding nodes ...")
+    G.add_nodes_from(data["nodes"])
+    print("Adding edges ...")
+    G.add_edges_from(data["edges"])
 
-# 4. Вычисляем координаты узлов
-pos = nx.spring_layout(G_sub, k=1.5, iterations=50, seed=42)  # k регулирует расстояние
+    print(f"Graph loaded: {G.number_of_nodes()} nodes, {G.number_of_edges()} edges")
 
-# 5. Рисование с помощью matplotlib
-plt.figure(figsize=(16, 10))
+    plt.figure(figsize=(20, 20))
+    pos = nx.spring_layout(G, k=0.15, iterations=20, seed=42)
+    nx.draw_networkx_nodes(G, pos, node_size=50, node_color="skyblue", alpha=0.8)
+    nx.draw_networkx_edges(
+        G, pos, edge_color="gray", alpha=0.3, arrows=True, arrowsize=10
+    )
+    if G.number_of_nodes() <= 50:
+        nx.draw_networkx_labels(G, pos, font_size=8, font_family="sans-serif")
 
-labels = {node: node.replace('_', ' ') for node in G_sub.nodes()}
-nx.draw(G_sub, pos, labels=labels, node_size=500, font_size=8, arrows=True)
-plt.axis('off')
-plt.savefig('draw_wiki_graph.png', dpi=600)
-plt.show()
+    plt.axis("off")
+    plt.tight_layout()
+    plt.savefig(args.output, dpi=150)
+    plt.show()
+    print(f"Graph image saved to {args.output}")
+
+
+if __name__ == "__main__":
+    main()

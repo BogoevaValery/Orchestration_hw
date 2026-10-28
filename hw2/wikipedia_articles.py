@@ -1,77 +1,116 @@
 #!/home/lerathebest/.local/share/virtualenvs/Orchestration_hw-na0ESBGG/bin/python
 
-import re
-from collections import deque
-import json
 import argparse
+import json
+import time
+import sys
+from collections import deque
+from urllib.parse import urljoin, unquote
+
 import requests
 from bs4 import BeautifulSoup
 
-def get_internal_links(base_url, target):
-    my_headers = {"User-Agent": "Mozilla/5.0"}
-    #full_url = requests.compat.urljoin(base_url, target)
-    full_url = base_url + target
-    print(f"Fetching {full_url}...")
-    article = requests.get(full_url, headers=my_headers)
-    
-    print(f"Status code: {article.status_code}")
-    
-    bs = BeautifulSoup(article.text, "html.parser")
-    
-    pattern = re.compile(r"/wiki/((?![А-Яа-я:]|File:|Category:|Help:|Portal:|Wikipedia:|Special:|Template:|Talk:)(.*))")
+USER_AGENT = "WikiCrawler (Educational project; bogoeva.v@icloud.com)"
+HEADERS = {"User-Agent": USER_AGENT}
+BASE_URL = "https://en.wikipedia.org"
 
-    content = bs.find("div", id="bodyContent")
-    
-    if content is None:
-        print(f"Предупреждение: bodyContent не найден на {full_url}")
-        return []
-    
-    res = []
-    for link in content.find_all("a", href=pattern):
-        href = link["href"]
-        match = pattern.search(href)
-        if match:
-            article = match.group(2)
-            res.append(article)
-    
-    return list(set(res))
 
-def walk_on_depth(url, max_depth):
-    base_url = "https://en.wikipedia.org/wiki/"
-    
-    visited = set()       
-    graph = {}            
-    queue = deque()  
-    src = url.split("/")[-1]       
-    queue.append((src, 1))
+def extract_wiki_links(html, base_url, max_links):
+    soup = BeautifulSoup(html, "html.parser")
+    content = soup.find("div", id="mw-content-text")
+    if not content:
+        content = soup  # fallback
 
-    while queue:
-        current, depth = queue.popleft()   
-        if current in visited:
+    links = []
+    for a_tag in content.find_all("a", href=True):
+        href = a_tag["href"]
+        if not "/wiki/" in href:
+            continue
+        if "#" in href:
+            href = href.split("#")[0]
+            if not href:
+                continue
+
+        full_url = urljoin(base_url, href)
+        title = unquote(full_url.split("/wiki/")[-1].split("#")[0])
+        if title not in [t for t, _ in links]:
+            links.append((title, full_url))
+            if len(links) >= max_links:
+                break
+
+    return links
+
+
+def crawl(start_url, max_depth, max_links):
+    start_title = unquote(start_url.split("/wiki/")[-1].split("#")[0])
+    visited = set()
+    visited.add(start_title)
+    edges = []
+    frontier = deque()
+    frontier.append((start_title, start_url, 0))
+
+    while frontier:
+        title, url, depth = frontier.popleft()
+        if depth >= max_depth:
+            pass
+
+        print(f"Fetching (depth {depth}): {title}")
+        try:
+            resp = requests.get(url, headers=HEADERS, timeout=10)
+            print(resp.status_code)
+            if resp.status_code != 200:
+                print(f"  Skipping {title} (HTTP {resp.status_code})")
+                continue
+        except Exception as e:
+            print(f"  Error fetching {title}: {e}")
             continue
 
-        print(f"Обрабатываем {current} (глубина {depth})")
-        links = get_internal_links(base_url, current)
-        graph[current] = links
-        visited.add(current)
+        discovered = extract_wiki_links(resp.text, url, max_links)
+        print(f"  Found {len(discovered)} links")
 
-        if depth < max_depth:
-            for link in links:
-                if link not in visited:
-                    queue.append((link, depth + 1))
-                    
-    return graph
+        for dst_title, dst_url in discovered:
+            edges.append([title, dst_title])
 
-print("Starting wiki crawler...")
-parser = argparse.ArgumentParser(prog="My wiki crawler", description="Builds network graph of english wiki in some depth of some url")
-parser.add_argument("--url", required=True, help="Link to wiki page")
-parser.add_argument("--depth", type=int, default=3, help="Depth for walking from url")
-parser.add_argument("--out_json", required=True,help="Name of output json")
-args = parser.parse_args()
-print(f"URL: {args.url}, Depth: {args.depth}, Output JSON: {args.out_json}")
+            if dst_title not in visited and depth + 1 <= max_depth:
+                visited.add(dst_title)
+                frontier.append((dst_title, dst_url, depth + 1))
 
-print("Crawling Wikipedia...")
-res = walk_on_depth(args.url, args.depth)
-print(*res, sep="\n")
-with open(args.out_json, "w", encoding="utf-8") as out:
-    json.dump(res, out)
+        time.sleep(0.1)
+
+    nodes = set()
+    for src, dst in edges:
+        nodes.add(src)
+        nodes.add(dst)
+    nodes.add(start_title)
+
+    graph = {
+        "nodes": sorted(list(nodes)),
+        "edges": edges,
+    }
+    return graph, start_title
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Wiki crawler")
+    parser.add_argument("--url", required=True, help="Starting URL")
+    parser.add_argument("--depth", type=int, required=True, help="Max depth")
+    parser.add_argument(
+        "--max-links",
+        type=int,
+        default=100,
+        help="Max num of links per page",
+    )
+    args = parser.parse_args()
+
+    graph, start_title = crawl(args.url, args.depth, args.max_links)
+
+    output_file = f"{start_title}.json"
+    with open(output_file, "w", encoding="utf-8") as f:
+        json.dump(graph, f, ensure_ascii=False, indent=2)
+
+    print(f"Graph saved to {output_file}")
+    print(f"Nodes: {len(graph['nodes'])}, Edges: {len(graph['edges'])}")
+
+
+if __name__ == "__main__":
+    main()
